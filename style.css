@@ -88,6 +88,15 @@ html, body {
 }
 #status:empty { display: none; }
 
+#ver {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, .55);
+  pointer-events: none;
+}
+
 #controls {
   display: flex;
   align-items: center;
