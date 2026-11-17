@@ -88,6 +88,19 @@ html, body {
 }
 #status:empty { display: none; }
 
+#update {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom));
+  z-index: 10;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, .4);
+}
+#update[hidden] { display: none; }
+
 #ver {
   position: absolute;
   top: 8px;

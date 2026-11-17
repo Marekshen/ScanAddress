@@ -1,4 +1,4 @@
-const APP_VERSION = 'v1.5';
+const APP_VERSION = 'v1.6';
 const CITY ='(?:[臺台]北市|新北市|桃園市|[臺台]中市|[臺台]南市|高雄市|基隆市|新竹市|嘉義市|新竹縣|苗栗縣|彰化縣|南投縣|雲林縣|嘉義縣|屏東縣|宜蘭縣|花蓮縣|[臺台]東縣|澎湖縣|金門縣|連江縣)';
 const H = '[\\u4e00-\\u9fff]';
 const N = '[0-9一二三四五六七八九十百零〇]+';
@@ -359,6 +359,28 @@ observer.observe(viewer, { attributes: true, attributeFilter: ['class'] });
 $('#ver').textContent = APP_VERSION;
 startCamera();
 
+function onNewVersion() {
+  if (!list.children.length && !busy) {
+    location.reload();
+    return;
+  }
+  const bar = $('#update');
+  bar.hidden = false;
+  bar.onclick = () => location.reload();
+}
+
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).catch(() => {}));
+  const hadController = !!navigator.serviceWorker.controller;
+  let notified = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!hadController || notified) return;
+    notified = true;
+    onNewVersion();
+  });
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then((reg) => {
+      document.addEventListener('visibilitychange', () => { if (!document.hidden) reg.update(); });
+      setInterval(() => reg.update(), 30 * 60 * 1000);
+    }).catch(() => {});
+  });
 }
