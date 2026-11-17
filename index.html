@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111418">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="地址掃描">
+<title>地址掃描</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main id="app">
+  <section id="viewer">
+    <video id="video" playsinline muted autoplay></video>
+    <img id="photo" alt="" hidden>
+    <div id="frame"><span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span></div>
+    <div id="status">啟動相機中…</div>
+  </section>
+
+  <section id="controls">
+    <label class="toggle"><input type="checkbox" id="auto" checked><span>自動掃描</span></label>
+    <button id="scan" class="primary" type="button">掃描</button>
+    <button id="import" class="secondary" type="button">匯入照片</button>
+    <input type="file" id="file" accept="image/*" multiple hidden>
+  </section>
+
+  <section id="results">
+    <div id="empty">尚未偵測到地址，將地址對準框內或匯入照片</div>
+    <ul id="list"></ul>
+    <details id="raw"><summary>辨識原文</summary><pre id="rawText"></pre></details>
+  </section>
+</main>
+
+<template id="itemTpl">
+  <li class="item">
+    <input class="addr" type="text" enterkeyhint="go" spellcheck="false">
+    <div class="actions">
+      <a class="map" target="_blank" rel="noopener">在 Google 地圖開啟</a>
+      <button class="del" type="button" aria-label="移除">移除</button>
+    </div>
+  </li>
+</template>
+
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
