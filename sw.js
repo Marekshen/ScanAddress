@@ -1,4 +1,4 @@
-const VERSION = 'scan-address-v1.3';
+const VERSION = 'scan-address-v1.4';
 const SHELL = [
   './',
   'index.html',

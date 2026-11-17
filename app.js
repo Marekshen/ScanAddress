@@ -68,7 +68,8 @@ function mapQuery(addr) {
   const n = '(\\d+|[零〇一二三四五六七八九十]+)';
   return normalize(addr)
     .replace(new RegExp(`(\\d+)號之${n}`, 'g'), (_, a, b) => `${a}-${cnToNum(b)}號`)
-    .replace(new RegExp(`(\\d+)之${n}`, 'g'), (_, a, b) => `${a}-${cnToNum(b)}`);
+    .replace(new RegExp(`(\\d+)之${n}`, 'g'), (_, a, b) => `${a}-${cnToNum(b)}`)
+    .replace(/號[^號]*$/, '號');
 }
 
 function mapUrl(addr) {
@@ -85,6 +86,23 @@ function addResult(addr) {
   link.href = mapUrl(addr);
   input.addEventListener('input', () => { link.href = mapUrl(input.value.trim()); });
   input.addEventListener('keydown', (e) => { if (e.key === 'Enter') link.click(); });
+  const copyBtn = li.querySelector('.copy');
+  copyBtn.addEventListener('click', async () => {
+    const text = input.value.trim();
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      input.select();
+      document.execCommand('copy');
+      input.blur();
+    }
+    copyBtn.textContent = '已複製';
+    copyBtn.classList.add('done');
+    setTimeout(() => {
+      copyBtn.textContent = '複製';
+      copyBtn.classList.remove('done');
+    }, 1500);
+  });
   li.querySelector('.del').addEventListener('click', () => {
     found.delete(addr);
     li.remove();

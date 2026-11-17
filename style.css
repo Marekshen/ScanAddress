@@ -163,6 +163,8 @@ button, .map {
 
 .actions { display: flex; gap: 8px; margin-top: 10px; }
 .map { flex: 1; background: var(--accent-2); color: #fff; font-weight: 600; }
+.copy { background: var(--bg); color: var(--text); border: 1px solid var(--line); white-space: nowrap; }
+.copy.done { color: var(--accent-2); border-color: var(--accent-2); }
 .del { background: transparent; color: var(--danger); border: 1px solid var(--line); }
 
 #raw { margin-top: 16px; color: var(--muted); font-size: 13px; }
