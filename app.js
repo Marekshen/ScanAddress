@@ -1,4 +1,5 @@
-const CITY = '(?:[臺台]北市|新北市|桃園市|[臺台]中市|[臺台]南市|高雄市|基隆市|新竹市|嘉義市|新竹縣|苗栗縣|彰化縣|南投縣|雲林縣|嘉義縣|屏東縣|宜蘭縣|花蓮縣|[臺台]東縣|澎湖縣|金門縣|連江縣)';
+const APP_VERSION = 'v1.5';
+const CITY ='(?:[臺台]北市|新北市|桃園市|[臺台]中市|[臺台]南市|高雄市|基隆市|新竹市|嘉義市|新竹縣|苗栗縣|彰化縣|南投縣|雲林縣|嘉義縣|屏東縣|宜蘭縣|花蓮縣|[臺台]東縣|澎湖縣|金門縣|連江縣)';
 const H = '[\\u4e00-\\u9fff]';
 const N = '[0-9一二三四五六七八九十百零〇]+';
 const ADDR_RE = new RegExp(
@@ -69,11 +70,36 @@ function mapQuery(addr) {
   return normalize(addr)
     .replace(new RegExp(`(\\d+)號之${n}`, 'g'), (_, a, b) => `${a}-${cnToNum(b)}號`)
     .replace(new RegExp(`(\\d+)之${n}`, 'g'), (_, a, b) => `${a}-${cnToNum(b)}`)
-    .replace(/號[^號]*$/, '號');
+    .replace(/(\d+(?:-\d+)?號).*$/, '$1');
 }
 
 function mapUrl(addr) {
   return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(mapQuery(addr));
+}
+
+function legacyCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.setAttribute('readonly', '');
+  ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;font-size:16px;';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  ta.setSelectionRange(0, text.length);
+  let ok = false;
+  try { ok = document.execCommand('copy'); } catch { ok = false; }
+  ta.remove();
+  return ok;
+}
+
+async function copyText(text) {
+  if (legacyCopy(text)) return true;
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function addResult(addr) {
@@ -88,16 +114,9 @@ function addResult(addr) {
   input.addEventListener('keydown', (e) => { if (e.key === 'Enter') link.click(); });
   const copyBtn = li.querySelector('.copy');
   copyBtn.addEventListener('click', async () => {
-    const text = input.value.trim();
-    try {
-      await navigator.clipboard.writeText(text);
-    } catch {
-      input.select();
-      document.execCommand('copy');
-      input.blur();
-    }
-    copyBtn.textContent = '已複製';
-    copyBtn.classList.add('done');
+    const ok = await copyText(input.value.trim());
+    copyBtn.textContent = ok ? '已複製' : '複製失敗';
+    copyBtn.classList.toggle('done', ok);
     setTimeout(() => {
       copyBtn.textContent = '複製';
       copyBtn.classList.remove('done');
@@ -337,6 +356,7 @@ const observer = new MutationObserver(() => {
 });
 observer.observe(viewer, { attributes: true, attributeFilter: ['class'] });
 
+$('#ver').textContent = APP_VERSION;
 startCamera();
 
 if ('serviceWorker' in navigator) {
