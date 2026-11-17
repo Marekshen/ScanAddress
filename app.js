@@ -53,8 +53,14 @@ function extract(raw) {
   return out;
 }
 
+function mapQuery(addr) {
+  return addr
+    .replace(/(\d+)之(\d+)號/g, '$1-$2號')
+    .replace(/(\d+)號之(\d+)/g, '$1-$2號');
+}
+
 function mapUrl(addr) {
-  return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(addr);
+  return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(mapQuery(addr));
 }
 
 function addResult(addr) {
