@@ -1,4 +1,4 @@
-const VERSION = 'scan-address-v1.2';
+const VERSION = 'scan-address-v1.3';
 const SHELL = [
   './',
   'index.html',
@@ -12,7 +12,11 @@ const SHELL = [
 const CDN_HOSTS = ['cdn.jsdelivr.net', 'tessdata.projectnaptha.com', 'unpkg.com'];
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(VERSION).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));
+  e.waitUntil(
+    caches.open(VERSION)
+      .then((c) => c.addAll(SHELL.map((u) => new Request(u, { cache: 'reload' }))))
+      .then(() => self.skipWaiting())
+  );
 });
 
 self.addEventListener('activate', (e) => {
@@ -40,7 +44,7 @@ self.addEventListener('fetch', (e) => {
 
   if (url.origin === location.origin) {
     e.respondWith(
-      fetch(req).then((res) => {
+      fetch(req, { cache: 'no-cache' }).then((res) => {
         if (res.ok) caches.open(VERSION).then((c) => c.put(req, res.clone()));
         return res;
       }).catch(() => caches.match(req, { ignoreSearch: true }))

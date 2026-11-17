@@ -53,10 +53,22 @@ function extract(raw) {
   return out;
 }
 
+const CN_DIGIT = { 零: 0, 〇: 0, 一: 1, 二: 2, 三: 3, 四: 4, 五: 5, 六: 6, 七: 7, 八: 8, 九: 9 };
+
+function cnToNum(s) {
+  if (/^\d+$/.test(s)) return s;
+  if (s.includes('十')) {
+    const [a, b] = s.split('十');
+    return String((a ? CN_DIGIT[a] : 1) * 10 + (b ? CN_DIGIT[b] : 0));
+  }
+  return [...s].map((c) => CN_DIGIT[c]).join('');
+}
+
 function mapQuery(addr) {
-  return addr
-    .replace(/(\d+)之(\d+)號/g, '$1-$2號')
-    .replace(/(\d+)號之(\d+)/g, '$1-$2號');
+  const n = '(\\d+|[零〇一二三四五六七八九十]+)';
+  return normalize(addr)
+    .replace(new RegExp(`(\\d+)號之${n}`, 'g'), (_, a, b) => `${a}-${cnToNum(b)}號`)
+    .replace(new RegExp(`(\\d+)之${n}`, 'g'), (_, a, b) => `${a}-${cnToNum(b)}`);
 }
 
 function mapUrl(addr) {
@@ -310,5 +322,5 @@ observer.observe(viewer, { attributes: true, attributeFilter: ['class'] });
 startCamera();
 
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).catch(() => {}));
 }
